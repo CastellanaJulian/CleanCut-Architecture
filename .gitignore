@@ -8,12 +8,22 @@ venv/
 # -- python
 __pycache__/
 *.py[cod]
+*.pyc
 
 # -- terraform
 .terraform/
 *.tfstate
 *.tfstate.backup
 crash.log
+*.tfvars
+
 
 # -- macOS
 .DS_Store
+
+# --- Archivos generados
+*.zip
+
+# --- LocalStack Data
+localstack_data/
+infra/localstack_data/
