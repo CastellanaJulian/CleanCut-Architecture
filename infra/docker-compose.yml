@@ -9,3 +9,21 @@ services:
     volumes:
       - "./localstack_data:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - barberia-network
+
+  db:
+    image: postgres:15-alpine
+    container_name: postgres_db
+    environment:
+      - POSTGRES_USER=${TF_VAR_db_user}
+      - POSTGRES_PASSWORD=${TF_VAR_db_password}
+      - POSTGRES_DB=${TF_VAR_db_name}
+    ports:
+      - "5432:5432"
+    networks:
+      - barberia-network
+
+networks:
+  barberia-network:
+    driver: bridge
