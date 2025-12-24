@@ -27,3 +27,20 @@ crash.log
 # --- LocalStack Data
 localstack_data/
 infra/localstack_data/
+
+# --- Ignorar librerías de Python instaladas localmente en app/ ---
+app/bin/
+app/lib/
+app/include/
+app/pg8000/
+app/pg8000-*/
+app/asn1crypto/
+app/asn1crypto-*/
+app/dateutil/
+app/python_dateutil-*/
+app/scramp/
+app/scramp-*/
+app/six.py
+app/six-*/
+app/__pycache__/
+app/*.dist-info/
