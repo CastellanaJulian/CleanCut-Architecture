@@ -1,0 +1,95 @@
+// --- NIVEL SAAS (Tu Cliente: El dueño del negocio) ---
+
+Table tenants {
+  id varchar [pk, note: "Ej: 'Barberia Hnos'"]
+  nombre varchar
+  email_contacto varchar
+  plan_suscripcion varchar [default: 'free']
+  creado_en timestamp
+}
+
+Table sucursales {
+  id varchar [pk]
+  tenant_id varchar [ref: > tenants.id]
+  nombre varchar [note: "Ej: Sucursal Centro"]
+  direccion varchar
+  timezone varchar [default: 'America/Argentina/Buenos_Aires']
+}
+
+// --- RECURSOS ---
+
+Table staff {
+  id varchar [pk]
+  sucursal_id varchar [ref: > sucursales.id]
+  nombre varchar
+  rol varchar [default: 'staff']
+  disponibilidad_semanal jsonb
+  activo boolean [default: true]
+}
+
+Table servicios {
+  id varchar [pk]
+  sucursal_id varchar [ref: > sucursales.id]
+  nombre varchar
+  duracion_minutos int
+  precio decimal(10, 2)
+  moneda varchar [default: 'ARS']
+}
+
+Table staff_servicios {
+  staff_id varchar [ref: > staff.id]
+  servicio_id varchar [ref: > servicios.id]
+  primary key (staff_id, servicio_id)
+}
+
+// --- CLIENTES (Identidad por Celular) ---
+
+Table clientes {
+  id varchar [pk]
+  tenant_id varchar [ref: > tenants.id]
+  
+  // EL CAMBIO CLAVE:
+  telefono varchar [not null, note: "ID Principal del usuario (WhatsApp)"]
+  email varchar [null, note: "Opcional, solo para comprobantes"]
+  
+  nombre varchar
+  staff_preferido_id varchar [ref: > staff.id, null]
+  notas_internas text
+  creado_en timestamp
+
+  // Definición de índice único visual
+  indexes {
+    (tenant_id, telefono) [unique, note: "Un cliente no puede duplicarse en el mismo negocio"]
+  }
+}
+
+// --- CORE (Turnos y Pagos) ---
+
+Enum estado_turno {
+  pendiente
+  confirmado
+  cancelado
+  completado
+  no_show
+}
+
+Table turnos {
+  id varchar [pk]
+  sucursal_id varchar [ref: > sucursales.id]
+  cliente_id varchar [ref: > clientes.id]
+  staff_id varchar [ref: > staff.id]
+  servicio_id varchar [ref: > servicios.id]
+  
+  fecha_hora_inicio timestamp
+  estado estado_turno [default: 'pendiente']
+  precio_congelado decimal(10, 2)
+}
+
+Table pagos {
+  id varchar [pk]
+  turno_id varchar [ref: > turnos.id]
+  monto decimal(10, 2)
+  metodo varchar [note: "efectivo, transferencia, mp"]
+  estado varchar [default: 'pagado']
+  fecha_pago timestamp
+}
